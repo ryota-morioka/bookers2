@@ -1,20 +1,84 @@
-<%= render 'list', book: @book_new %>
-<%= image_tag @book.user.get_profile_image(100,100) %>
-<%= @book.user.name %>
-Title:<%= @book.title %>
-Opinion:<%= @book.body %>
-
-
-<%= link_to 'Edit', edit_book_path(@book) %>
-<%= link_to 'Destroy', @book, method: :delete, data: { confirm: 'Are you sure?' } %>
-<%= link_to 'Back', books_path %>
 <div class="container">
+  <div class="col-md-16 mx-auto">
+    <% if @book.errors.any? %>
+        <h3><%= pluralize(@book.errors.count, "error") %>
+          prohibited this obj from being saved:</h3>
+        <ul>
+          <% @book.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="container px-5 px-sm-0">
   <div class="row">
-    <div class="col">
-      test
+    <div class="col-md-3">
+      <h2>User info</h2>
+      <% if @book.user.profile_image.attached? %>
+        <%= link_to image_tag(@book.user.get_profile_image(100, 100)), user_path(@book.user) %>
+      <% end %>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <td><%= @book.user.name %></td>
+          </tr>
+          <tr>
+            <th>Introduction</th>
+            <td><%= @book.user.introduction %></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <%= link_to edit_user_path(@book.user), class: "btn btn-outline-secondary btn-block" do %>
+          <i class="fas fa-user-cog"></i>
+        <% end %>
+      </div
+      <h2 class="mt-3">New book</h2>
+      <%= form_with(model: @book_new, url: books_path, method: :post) do |form| %>
+        <div class="form-group">
+          <%= form.label :title, "Title" %>
+          <%= form.text_field :title, id: "book_title", class: "form-control" %>
+        </div>
+        <div class="form-group">
+          <%= form.label :body, "Opinion" %>
+          <%= form.text_area :body, id: "book_body", class: "form-control" %>
+        </div>
+        <nav>
+          <%= form.submit 'Create Book', class: "btn btn-success btn-block" %>
+        </nav>
+      <% end %>
     </div>
-    <div class="col">
-      テスト
+    <div class="col-md-8 offset-md-1">
+      <h2>Book detail</h2>
+      <table class="table table-hover table-inverse">
+        <tbody>
+          <tr>
+            <td>
+              <% if @book.user.get_profile_image.present? %>
+                <%= link_to image_tag(@book.user.get_profile_image(100, 100)), user_path(@book.user) %>
+              <% end %>
+              <br>
+              <%= link_to @book.user.name, user_path(@book.user.id) %>
+            </td>
+            <td>
+              <%= link_to @book.title, book_path(@book), class: 'book_' + @book.id.to_s %>
+            </td>
+            <td><%= @book.body %></td>
+            <% if @book.user == current_user %>
+              <td>
+                <%= link_to 'Edit', edit_book_path, class: 'btn btn-sm btn-success edit_book_' + @book.id.to_s %>
+              </td>
+              <td>
+                <%= link_to 'Destroy', book_path(@book), data: { confirm: '本当に消しますか?' }, method: :delete, class: 'btn btn-sm btn-danger destroy_book_'+ @book.id.to_s, rel: 'nofollow' %>
+              </td>
+            <% end %>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
